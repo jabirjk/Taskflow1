@@ -237,17 +237,29 @@ export default function TaskDetails() {
                             <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" /> {bid.tasker_rating} Rating • 50+ Jobs
                           </div>
                         </div>
-                        <div className="text-3xl font-bold text-emerald-600">${bid.amount}</div>
+                        <div className="text-right">
+                          <div className="text-3xl font-bold text-emerald-600">${bid.amount}</div>
+                          {isOwner && (
+                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                              + ${(bid.amount * 0.05).toFixed(2)} Fee
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <p className="text-slate-600 dark:text-slate-400 italic leading-relaxed">"{bid.message}"</p>
                     </div>
                     {isOwner && task.status === 'open' && (
-                      <button 
-                        onClick={() => acceptBid(bid.id)}
-                        className="w-full md:w-auto px-8 py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold hover:opacity-90 transition-all shadow-xl shadow-slate-200 dark:shadow-emerald-900/20"
-                      >
-                        Hire Now
-                      </button>
+                      <div className="w-full md:w-auto flex flex-col gap-2">
+                        <button 
+                          onClick={() => acceptBid(bid.id)}
+                          className="w-full px-8 py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold hover:opacity-90 transition-all shadow-xl shadow-slate-200 dark:shadow-emerald-900/20"
+                        >
+                          Hire Now
+                        </button>
+                        <div className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                          Total: ${(bid.amount * 1.05).toFixed(2)}
+                        </div>
+                      </div>
                     )}
                   </motion.div>
                 ))}

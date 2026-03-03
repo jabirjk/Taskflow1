@@ -3,7 +3,7 @@ import {
   Calendar, Clock, MessageSquare, CheckCircle2, ChevronRight, Star, 
   TrendingUp, DollarSign, Briefcase, MapPin, Wallet, ArrowUpRight, 
   ArrowDownLeft, Building2, ShieldCheck, Zap, Repeat, ListTodo, 
-  Activity, Bell, Settings as SettingsIcon, Plus, ArrowRight
+  Activity, Bell, Settings as SettingsIcon, Plus, ArrowRight, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Booking, Task, Transaction } from '../types';
@@ -322,12 +322,15 @@ export default function Dashboard() {
                     <Wallet className="w-10 h-10" />
                   </div>
                 </div>
-                <div className="mt-12 flex gap-4">
-                  <button className="flex-1 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition-all">
-                    Withdraw Funds
+                <div className="mt-12 flex flex-col sm:flex-row gap-4">
+                  <button className="flex-1 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition-all flex flex-col items-center justify-center">
+                    <span>Withdraw Funds</span>
+                    <span className="text-[10px] text-slate-500 font-normal">Standard (3-5 days)</span>
                   </button>
-                  <button className="flex-1 py-4 bg-white/10 text-white rounded-2xl font-bold hover:bg-white/20 transition-all">
-                    Add Card
+                  <button className="flex-1 py-4 bg-emerald-500 text-white rounded-2xl font-bold hover:bg-emerald-400 transition-all flex flex-col items-center justify-center relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-white/20 to-emerald-400/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                    <span className="flex items-center gap-1"><Zap className="w-4 h-4" /> Instant Payout</span>
+                    <span className="text-[10px] text-emerald-100 font-normal">1.5% Fee applies</span>
                   </button>
                 </div>
               </div>

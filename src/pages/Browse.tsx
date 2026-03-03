@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Map, List, Filter, Star, Shield, ArrowRight, Zap, BrainCircuit, Briefcase, MapPin, Clock, Search, X, SlidersHorizontal, User as UserIcon } from 'lucide-react';
+import { Sparkles, Map, List, Filter, Star, Shield, ArrowRight, Zap, BrainCircuit, Briefcase, MapPin, Clock, Search, X, SlidersHorizontal, User as UserIcon, Award, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, CATEGORIES } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -280,13 +280,21 @@ function TaskCard({ task, index }: { task: any, index: number }) {
 }
 
 function TaskerCard({ tasker, index }: { tasker: User, index: number }) {
+  // Simulate some taskers being featured
+  const isFeatured = index % 3 === 0;
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="group bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-all"
+      className={`group bg-white dark:bg-slate-900 rounded-3xl border ${isFeatured ? 'border-orange-200 dark:border-orange-800 shadow-orange-100/50' : 'border-slate-100 dark:border-slate-800'} overflow-hidden hover:shadow-xl transition-all relative`}
     >
+      {isFeatured && (
+        <div className="absolute top-4 left-4 z-10 bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-lg">
+          <Award className="w-3 h-3" /> Featured
+        </div>
+      )}
       <div className="relative h-40">
         <img src={tasker.avatar} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={tasker.name} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -303,7 +311,12 @@ function TaskerCard({ tasker, index }: { tasker: User, index: number }) {
       
       <div className="p-5 space-y-4">
         <div>
-          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">{tasker.name}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">{tasker.name}</h3>
+            {index % 2 === 0 && (
+              <ShieldCheck className="w-4 h-4 text-blue-500" />
+            )}
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">{tasker.bio}</p>
         </div>
 

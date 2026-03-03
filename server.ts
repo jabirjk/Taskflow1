@@ -356,28 +356,88 @@ async function startServer() {
   });
 
   app.post("/api/messages", (req, res) => {
-    const { booking_id, sender_id, content } = req.body;
-    const result = db.prepare("INSERT INTO messages (booking_id, sender_id, content) VALUES (?, ?, ?)")
-      .run(booking_id, sender_id, content);
+    const { booking_id, sender_id, content, type, file_url } = req.body;
+    const result = db.prepare("INSERT INTO messages (booking_id, sender_id, content, type, file_url) VALUES (?, ?, ?, ?, ?)")
+      .run(booking_id, sender_id, content, type || 'text', file_url || null);
     res.json({ id: result.lastInsertRowid, success: true });
+  });
+
+  app.post("/api/messages/:bookingId/summarize", async (req, res) => {
+    const { bookingId } = req.params;
+    const messages = db.prepare("SELECT * FROM messages WHERE booking_id = ? ORDER BY created_at ASC").all(bookingId);
+    
+    if (messages.length === 0) return res.json({ summary: "No messages to summarize." });
+
+    const chatText = messages.map((m: any) => `${m.sender_id}: ${m.content}`).join("\n");
+    
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Summarize the following chat history concisely:\n\n${chatText}`,
+      });
+      res.json({ summary: response.text });
+    } catch (error) {
+      console.error("Summarization error:", error);
+      res.status(500).json({ error: "Failed to summarize chat." });
+    }
+  });
+
+  app.post("/api/messages/:id/translate", async (req, res) => {
+    const { id } = req.params;
+    const { targetLanguage } = req.body;
+    const message = db.prepare("SELECT * FROM messages WHERE id = ?").get(id) as any;
+    
+    if (!message) return res.status(404).json({ error: "Message not found" });
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Translate the following text to ${targetLanguage}:\n\n${message.content}`,
+      });
+      
+      const translatedText = response.text;
+      db.prepare("UPDATE messages SET translated_content = ? WHERE id = ?").run(translatedText, id);
+      
+      res.json({ translated_content: translatedText });
+    } catch (error) {
+      console.error("Translation error:", error);
+      res.status(500).json({ error: "Failed to translate message." });
+    }
   });
 
   // --- REAL-TIME MESSAGING (WEBSOCKETS) ---
   io.on("connection", (socket) => {
     socket.on("join_room", (roomId) => socket.join(roomId));
+    
     socket.on("message", (data) => {
-      const { roomId, senderId, content } = data;
+      const { roomId, senderId, content, type, fileUrl } = data;
       // Save to DB
-      db.prepare("INSERT INTO messages (booking_id, sender_id, content) VALUES (?, ?, ?)")
-        .run(roomId, senderId, content);
+      const result = db.prepare("INSERT INTO messages (booking_id, sender_id, content, type, file_url) VALUES (?, ?, ?, ?, ?)")
+        .run(roomId, senderId, content, type || 'text', fileUrl || null);
       
       // Broadcast to room
       io.to(roomId).emit("message", {
-        id: Math.random().toString(36).substring(2, 11),
+        id: result.lastInsertRowid,
         sender_id: senderId,
         content,
+        type: type || 'text',
+        file_url: fileUrl || null,
+        is_read: 0,
         created_at: new Date().toISOString()
       });
+    });
+
+    socket.on("typing", (data) => {
+      const { roomId, senderId, isTyping } = data;
+      socket.to(roomId).emit("typing", { senderId, isTyping });
+    });
+
+    socket.on("read_receipt", (data) => {
+      const { roomId, messageId, readerId } = data;
+      db.prepare("UPDATE messages SET is_read = 1 WHERE id = ?").run(messageId);
+      io.to(roomId).emit("read_receipt", { messageId, readerId });
     });
   });
 

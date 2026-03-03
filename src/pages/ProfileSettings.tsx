@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'motion/react';
-import { User, Mail, Camera, Save, Shield, CheckCircle2, Briefcase, Plus, X } from 'lucide-react';
+import { User, Mail, Camera, Save, Shield, CheckCircle2, Briefcase, Plus, X, Zap, CreditCard, Award, TrendingUp } from 'lucide-react';
 
 export default function ProfileSettings() {
   const { user } = useAuth();
@@ -10,6 +10,10 @@ export default function ProfileSettings() {
   const [skills, setSkills] = useState<string[]>(user?.skills || []);
   const [newSkill, setNewSkill] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  const [instantPayouts, setInstantPayouts] = useState(false);
+  const [hasPremiumBadge, setHasPremiumBadge] = useState(false);
+  const [hasBackgroundCheck, setHasBackgroundCheck] = useState(true);
 
   if (!user) return null;
 
@@ -153,7 +157,106 @@ export default function ProfileSettings() {
               </div>
             )}
 
-            <div className="pt-6 border-t border-slate-100 flex justify-end gap-4">
+            {user.role === 'tasker' && (
+              <div className="space-y-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold flex items-center gap-2 dark:text-white">
+                    <TrendingUp className="w-5 h-5 text-emerald-600" />
+                    Boost Your Profile
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Upgrade your account to get more visibility and faster payments.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Premium Background Check */}
+                  <div className="p-6 rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4 relative overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-800 transition-all">
+                    <div className="flex justify-between items-start">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600">
+                        <Shield className="w-6 h-6" />
+                      </div>
+                      {hasBackgroundCheck ? (
+                        <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 text-xs font-bold rounded-full flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Active
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold rounded-full">
+                          $49 / year
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-bold dark:text-white">Premium Background Check</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Get the verified badge to build trust and win 3x more tasks.</p>
+                    </div>
+                    {!hasBackgroundCheck && (
+                      <button 
+                        onClick={() => setHasBackgroundCheck(true)}
+                        className="w-full py-2.5 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity"
+                      >
+                        Upgrade Now
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Featured Tasker Badge */}
+                  <div className="p-6 rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4 relative overflow-hidden group hover:border-orange-200 dark:hover:border-orange-800 transition-all">
+                    <div className="flex justify-between items-start">
+                      <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center text-orange-600">
+                        <Award className="w-6 h-6" />
+                      </div>
+                      {hasPremiumBadge ? (
+                        <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 text-xs font-bold rounded-full flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Active
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold rounded-full">
+                          $19 / month
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-bold dark:text-white">Featured Tasker Badge</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Stand out in search results with a highlighted profile and priority ranking.</p>
+                    </div>
+                    {!hasPremiumBadge && (
+                      <button 
+                        onClick={() => setHasPremiumBadge(true)}
+                        className="w-full py-2.5 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity"
+                      >
+                        Boost Profile
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Instant Payouts */}
+                  <div className="p-6 rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4 md:col-span-2 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600">
+                        <Zap className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold dark:text-white flex items-center gap-2">
+                          Instant Payouts
+                          <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[10px] rounded-md uppercase tracking-wider">1.5% Fee</span>
+                        </h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Get paid within 30 minutes of task completion instead of waiting 3-5 days.</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={instantPayouts}
+                        onChange={() => setInstantPayouts(!instantPayouts)}
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4">
               <button className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
                 Cancel
               </button>

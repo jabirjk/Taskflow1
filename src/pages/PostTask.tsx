@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, Loader2, CheckCircle2, DollarSign, Clock, Tag, ShieldCheck, Zap, Check } from 'lucide-react';
+import { Sparkles, ArrowRight, Loader2, CheckCircle2, DollarSign, Clock, Tag, ShieldCheck, Zap, Check, Info, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,7 @@ export default function PostTask() {
   const [recurrencePattern, setRecurrencePattern] = useState('weekly');
   const [withInsurance, setWithInsurance] = useState(true);
   const [instantMatch, setInstantMatch] = useState(false);
+  const [boostListing, setBoostListing] = useState(false);
 
   const handleAnalyze = async () => {
     if (!description.trim()) return;
@@ -175,6 +176,22 @@ export default function PostTask() {
                           />
                         </div>
 
+                        <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100">
+                          <div className="flex items-center gap-3">
+                            <TrendingUp className="w-5 h-5 text-orange-500" />
+                            <div>
+                              <p className="text-sm font-bold">Boost Listing</p>
+                              <p className="text-[10px] text-slate-400">Get 5x more views ($4.99)</p>
+                            </div>
+                          </div>
+                          <input 
+                            type="checkbox" 
+                            checked={boostListing}
+                            onChange={(e) => setBoostListing(e.target.checked)}
+                            className="w-5 h-5 rounded text-orange-500 focus:ring-orange-500"
+                          />
+                        </div>
+
                         {isRecurring && (
                           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="px-4 pb-2">
                             <select 
@@ -225,7 +242,33 @@ export default function PostTask() {
                           </div>
                         </div>
 
-                        <div className="pt-4 border-t border-emerald-100">
+                        <div className="pt-4 border-t border-emerald-100 dark:border-emerald-800/50 space-y-3">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-slate-500 dark:text-slate-400">Est. Task Cost</span>
+                            <span className="font-bold dark:text-white">${(aiResult?.suggestedPrice || 40) * (aiResult?.estimatedHours || 2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                              Platform Fee (5%)
+                              <Info className="w-3 h-3 text-slate-400" />
+                            </span>
+                            <span className="font-bold dark:text-white">${((aiResult?.suggestedPrice || 40) * (aiResult?.estimatedHours || 2) * 0.05).toFixed(2)}</span>
+                          </div>
+                          {boostListing && (
+                            <div className="flex justify-between items-center text-sm text-orange-600 dark:text-orange-400">
+                              <span className="flex items-center gap-1">
+                                Boost Listing
+                              </span>
+                              <span className="font-bold">$4.99</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center text-lg font-bold pt-2 border-t border-emerald-100 dark:border-emerald-800/50">
+                            <span className="text-emerald-900 dark:text-emerald-100">Total Estimate</span>
+                            <span className="text-emerald-600 dark:text-emerald-400">${(((aiResult?.suggestedPrice || 40) * (aiResult?.estimatedHours || 2) * 1.05) + (boostListing ? 4.99 : 0)).toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-emerald-100 dark:border-emerald-800/50">
                           <button 
                             type="button"
                             onClick={() => setInstantMatch(!instantMatch)}

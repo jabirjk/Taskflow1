@@ -82,10 +82,29 @@ db.exec(`
     booking_id TEXT NOT NULL,
     sender_id TEXT NOT NULL,
     content TEXT NOT NULL,
+    type TEXT DEFAULT 'text', -- 'text', 'image', 'file', 'voice'
+    file_url TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    translated_content TEXT,
+    is_encrypted BOOLEAN DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(booking_id) REFERENCES bookings(id)
   );
+`);
 
+try {
+  db.exec(`
+    ALTER TABLE messages ADD COLUMN type TEXT DEFAULT 'text';
+    ALTER TABLE messages ADD COLUMN file_url TEXT;
+    ALTER TABLE messages ADD COLUMN is_read BOOLEAN DEFAULT 0;
+    ALTER TABLE messages ADD COLUMN translated_content TEXT;
+    ALTER TABLE messages ADD COLUMN is_encrypted BOOLEAN DEFAULT 1;
+  `);
+} catch (e) {
+  // Columns likely already exist
+}
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS bids (
     id TEXT PRIMARY KEY,
     task_id TEXT NOT NULL,
