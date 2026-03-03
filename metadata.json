@@ -1,0 +1,7 @@
+{
+  "name": "TaskFlow",
+  "description": "A modernized, AI-powered marketplace for local services and professional tasks. Connect with skilled taskers instantly.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
